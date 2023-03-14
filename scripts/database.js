@@ -33,10 +33,66 @@ const database = {
             styleId: 3,
             timestamp: 1614659931693
         }
-    ]
+    ],
+   
+    orderBuilder: {
+
+    },
 }
 
 export const getMetals = () => {
     return database.metals.map(metal => ({...metal}))
 }
 
+
+//Added the three funtions below...think will need it
+export const getSizes = () => {
+    return database.sizes.map(size => ({...size}))
+}
+
+export const getStyles = () => {
+    return database.styles.map(style => ({...style}))
+}
+
+export const getCustomOrders = () => {
+    return database.customOrders.map(customOrder => ({...customOrder}))
+}
+
+//need to write functions to set state &&& export = no modules are allowed to have direct access to the database= Other modules import/invoke those function to get copies of current states
+
+//orderBuilder state object will store which one of those options was chosen...primary key/id uniquely identifies each options(metal,style,size)
+
+export const setMetal = (id) => {
+    database.orderBuilder.metalId = id
+}
+
+export const setSize = (id) => {
+    database.orderBuilder.sizeId = id
+}
+
+export const setStyle = (id) => {
+    database.orderBuilder.styleId = id
+}
+
+// function to take temporary user selections existing in orderBuilder and store permanently...  will be adding objects to  customOrder state array.
+
+export const addCustomOrder = () => {
+    // Copy the current state of user choices
+    const newOrder = {...database.orderBuilder}
+
+    // Add a new primary key to the object
+    const lastIndex = database.customOrders.length - 1
+    newOrder.id = database.customOrders[lastIndex].id + 1
+
+    // Add a timestamp to the order
+    newOrder.timestamp = Date.now()
+
+    // Add the new order object to custom orders state
+    database.customOrders.push(newOrder)
+
+    // Reset the temporary state for user choices
+    database.orderBuilder = {}
+
+    // Broadcast a notification that permanent state has changed
+    document.dispatchEvent(new CustomEvent("stateChanged"))
+}
